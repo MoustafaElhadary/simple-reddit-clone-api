@@ -44,7 +44,7 @@ export const postController = {
         req.body
       );
       const post = await AppDataSource.getRepository(Post).save(updatedPost);
-      res.json({ message: "succefully deleted Post", data: post });
+      res.json({ message: "succefully updated Post", data: post });
     } catch (error) {
       next(error);
     }
