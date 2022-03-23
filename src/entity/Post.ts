@@ -20,7 +20,7 @@ export class Post {
   @Column()
   body: string;
 
-  @Column({ nullable: false, generated: "increment" })
+  @Column({ nullable: false })
   userId: number;
 
   @OneToMany(() => Comment, (comment) => comment.post)

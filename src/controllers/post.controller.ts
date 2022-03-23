@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from "express";
-import { AppDataSource } from "../data-source";
-import { Comment } from "../entity/Comments";
-import { Post } from "../entity/Post";
-import { Vote } from "../entity/UserVote";
+import { NextFunction, Request, Response } from 'express';
+import { AppDataSource } from '../data-source';
+import { Comment } from '../entity/Comments';
+import { Post } from '../entity/Post';
+import { Vote } from '../entity/UserVote';
 export const postController = {
   async getAllPosts(req: Request, res: Response, next: NextFunction) {
     try {
@@ -38,15 +38,18 @@ export const postController = {
   },
   async updatePost(req: Request, res: Response, next: NextFunction) {
     try {
-      const existedPost = await AppDataSource.getRepository(Post).findOneBy({
+      const existingPost = await AppDataSource.getRepository(Post).findOneBy({
         id: +req.params.id,
       });
       const updatedPost = AppDataSource.getRepository(Post).merge(
-        existedPost,
-        req.body
+        existingPost,
+        req.body,
       );
-      const post = await AppDataSource.getRepository(Post).save(updatedPost);
-      res.json({ message: "succefully deleted Post", data: post });
+      const post = await AppDataSource.getRepository(Post).save({
+        ...updatedPost,
+        updatedAt: new Date(),
+      });
+      res.json({ message: 'successfully updated Post', data: post });
     } catch (error) {
       next(error);
     }
@@ -56,7 +59,7 @@ export const postController = {
       const deletedOne = await AppDataSource.getRepository(Post).delete({
         id: +req.params.id,
       });
-      res.json({ message: "succefully deleted Post", data: deletedOne });
+      res.json({ message: 'successfully deleted Post', data: deletedOne });
     } catch (error) {
       next(error);
     }
@@ -73,7 +76,7 @@ export const postController = {
         userId: post.userId,
       });
       const savedComment = await AppDataSource.getRepository(Comment).save(
-        comment
+        comment,
       );
       res.json({ data: savedComment });
     } catch (error) {
@@ -88,16 +91,16 @@ export const postController = {
       const existedComment = await AppDataSource.getRepository(Comment).findOne(
         {
           where: { post, id: +req.params.commentId },
-        }
+        },
       );
       const updatedComment = AppDataSource.getRepository(Comment).merge(
         existedComment,
-        req.body
+        req.body,
       );
       const savedComment = await AppDataSource.getRepository(Comment).save(
-        updatedComment
+        updatedComment,
       );
-      res.json({ message: "successfully updated comment", data: savedComment });
+      res.json({ message: 'successfully updated comment', data: savedComment });
     } catch (error) {
       next(error);
     }
@@ -112,7 +115,7 @@ export const postController = {
         post,
       });
       res.json({
-        message: "successfully delete comment",
+        message: 'successfully delete comment',
         data: deletedComment,
       });
     } catch (error) {
@@ -126,7 +129,7 @@ export const postController = {
         id: +req.params.postId,
       });
       const existedVote = post.votes?.find(
-        (vote) => vote.userId === post.userId
+        (vote) => vote.userId === post.userId,
       );
 
       if (existedVote) {
