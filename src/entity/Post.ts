@@ -1,13 +1,8 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from "typeorm";
-import { Comment } from "./Comments";
-import { Vote } from "./UserVote";
+  Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn
+} from 'typeorm';
+import { Comment } from './Comments';
+import { Vote } from './UserVote';
 
 @Entity()
 export class Post {
@@ -30,15 +25,15 @@ export class Post {
   votes: Vote[];
 
   @CreateDateColumn({
-    type: "timestamp",
-    default: () => "CURRENT_TIMESTAMP(6)",
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
   })
   createdAt: Date;
 
   @UpdateDateColumn({
-    type: "timestamp",
-    default: () => "CURRENT_TIMESTAMP(6)",
-    onUpdate: "CURRENT_TIMESTAMP(6)",
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+    onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
   updatedAt: Date;
 }

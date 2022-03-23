@@ -1,12 +1,7 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  ManyToMany,
-  JoinTable,
-} from "typeorm";
-import { Post } from "./Post";
+  Column, Entity, ManyToOne, PrimaryGeneratedColumn
+} from 'typeorm';
+import { Post } from './Post';
 @Entity()
 export class Vote {
   @PrimaryGeneratedColumn()

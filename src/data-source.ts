@@ -1,12 +1,12 @@
-import "reflect-metadata";
-import { DataSource } from "typeorm";
-import { config } from "dotenv";
-import { Post } from "./entity/Post";
-import { Comment } from "./entity/Comments";
-import { Vote } from "./entity/UserVote";
+import { config } from 'dotenv';
+import 'reflect-metadata';
+import { DataSource } from 'typeorm';
+import { Comment } from './entity/Comments';
+import { Post } from './entity/Post';
+import { Vote } from './entity/UserVote';
 config();
 export const AppDataSource = new DataSource({
-  type: "postgres",
+  type: 'postgres',
   host: process.env.PGHOST,
   port: Number(`${process.env.PGPORT}`),
   username: process.env.PGUSER,
@@ -15,9 +15,9 @@ export const AppDataSource = new DataSource({
   synchronize: true,
   logging: true,
   entities: [Post, Comment, Vote],
-  migrations: ["migration/*.ts"],
+  migrations: ['migration/*.ts'],
   subscribers: [],
   cli: {
-    migrationsDir: "src/migration",
+    migrationsDir: 'src/migration',
   },
 });

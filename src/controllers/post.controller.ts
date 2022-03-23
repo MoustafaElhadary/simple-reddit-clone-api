@@ -88,13 +88,13 @@ export const postController = {
       const post = await AppDataSource.getRepository(Post).findOneBy({
         id: +req.params.postId,
       });
-      const existedComment = await AppDataSource.getRepository(Comment).findOne(
-        {
-          where: { post, id: +req.params.commentId },
-        },
-      );
+      const existingComment = await AppDataSource.getRepository(
+        Comment,
+      ).findOne({
+        where: { post, id: +req.params.commentId },
+      });
       const updatedComment = AppDataSource.getRepository(Comment).merge(
-        existedComment,
+        existingComment,
         req.body,
       );
       const savedComment = await AppDataSource.getRepository(Comment).save(
@@ -128,12 +128,12 @@ export const postController = {
       const post = await AppDataSource.getRepository(Post).findOneBy({
         id: +req.params.postId,
       });
-      const existedVote = post.votes?.find(
+      const existingVote = post.votes?.find(
         (vote) => vote.userId === post.userId,
       );
 
-      if (existedVote) {
-        return res.json({ data: existedVote });
+      if (existingVote) {
+        return res.json({ data: existingVote });
       }
       const createdVote = AppDataSource.getRepository(Vote).create({
         userVote: +req.body.userVote,
