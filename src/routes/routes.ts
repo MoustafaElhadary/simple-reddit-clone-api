@@ -11,10 +11,10 @@ router.put('/posts/:id', postController.updatePost);
 router.delete('/posts/:id', postController.deletePost);
 
 //COMMENTS
-router.post('/posts/:id/comments', postController.createComment);
-router.put('/posts/:postId/comments/:commentId', postController.updateComment);
+router.post('/posts/:id/comment', postController.createComment);
+router.put('/posts/:postId/comment/:commentId', postController.updateComment);
 router.delete(
-  '/posts/:postId/comments/:commentId',
+  '/posts/:postId/comment/:commentId',
   postController.deleteComment,
 );
 
