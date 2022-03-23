@@ -105,7 +105,14 @@ export const postController = {
       const savedComment = await AppDataSource.getRepository(Comment).save(
         comment,
       );
-      res.json({ data: savedComment });
+      const newPost = await AppDataSource.getRepository(Post).findOne({
+        where: { id: +req.params.id },
+        relations: {
+          comments: true,
+          votes: true,
+        },
+      });
+      res.json({ data: newPost });
     } catch (error) {
       next(error);
     }
