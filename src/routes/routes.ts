@@ -12,5 +12,6 @@ router.delete(
   "/posts/:postId/comments/:commentId",
   postController.deleteComment
 );
+router.post("/posts/:postId/vote", postController.createVote);
 
 export default router;

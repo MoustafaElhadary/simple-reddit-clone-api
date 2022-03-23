@@ -10,7 +10,7 @@ export class Comment {
   body: string;
 
   @Column()
-  authorId: string;
+  userId: number;
 
   @ManyToOne(() => Post, (post) => post.comments)
   post: Post;
