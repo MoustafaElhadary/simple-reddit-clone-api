@@ -12,7 +12,15 @@ export const postController = {
           votes: true,
         },
       });
-      res.json({ data: posts });
+      const resPosts = posts.map((p) => {
+        return {
+          ...p,
+          commentsTotal: p.comments.length,
+          upVotesTotal: p.votes.filter((v) => v.userVote === 1).length,
+          downVotesTotal: p.votes.filter((v) => v.userVote === -1).length,
+        };
+      });
+      res.json({ data: resPosts });
     } catch (error) {
       next(error);
     }
@@ -28,18 +36,33 @@ export const postController = {
   },
   async getPostById(req: Request, res: Response, next: NextFunction) {
     try {
-      const post = await AppDataSource.getRepository(Post).findOneBy({
-        id: +req.params.id,
+      const post = await AppDataSource.getRepository(Post).findOne({
+        where: { id: +req.params.id },
+        relations: {
+          comments: true,
+          votes: true,
+        },
       });
-      res.json({ data: post });
+      res.json({
+        data: {
+          ...post,
+          commentsTotal: post.comments.length,
+          upVotesTotal: post.votes.filter((v) => v.userVote === 1).length,
+          downVotesTotal: post.votes.filter((v) => v.userVote === -1).length,
+        },
+      });
     } catch (error) {
       next(error);
     }
   },
   async updatePost(req: Request, res: Response, next: NextFunction) {
     try {
-      const existingPost = await AppDataSource.getRepository(Post).findOneBy({
-        id: +req.params.id,
+      const existingPost = await AppDataSource.getRepository(Post).findOne({
+        where: { id: +req.params.id },
+        relations: {
+          comments: true,
+          votes: true,
+        },
       });
       const updatedPost = AppDataSource.getRepository(Post).merge(
         existingPost,
@@ -66,8 +89,12 @@ export const postController = {
   },
   async createComment(req: Request, res: Response, next: NextFunction) {
     try {
-      const post = await AppDataSource.getRepository(Post).findOneBy({
-        id: +req.params.id,
+      const post = await AppDataSource.getRepository(Post).findOne({
+        where: { id: +req.params.id },
+        relations: {
+          comments: true,
+          votes: true,
+        },
       });
 
       const comment = AppDataSource.getRepository(Comment).create({
@@ -85,8 +112,12 @@ export const postController = {
   },
   async updateComment(req: Request, res: Response, next: NextFunction) {
     try {
-      const post = await AppDataSource.getRepository(Post).findOneBy({
-        id: +req.params.postId,
+      const post = await AppDataSource.getRepository(Post).findOne({
+        where: { id: +req.params.postId },
+        relations: {
+          comments: true,
+          votes: true,
+        },
       });
       const existingComment = await AppDataSource.getRepository(
         Comment,
@@ -107,8 +138,12 @@ export const postController = {
   },
   async deleteComment(req: Request, res: Response, next: NextFunction) {
     try {
-      const post = await AppDataSource.getRepository(Post).findOneBy({
-        id: +req.params.postId,
+      const post = await AppDataSource.getRepository(Post).findOne({
+        where: { id: +req.params.postId },
+        relations: {
+          comments: true,
+          votes: true,
+        },
       });
       const deletedComment = await AppDataSource.getRepository(Comment).delete({
         id: +req.params.commentId,
@@ -124,24 +159,40 @@ export const postController = {
   },
   async createVote(req: Request, res: Response, next: NextFunction) {
     try {
-      let userVote;
-      const post = await AppDataSource.getRepository(Post).findOneBy({
-        id: +req.params.postId,
+      if (![1, -1].includes(+req.body.userVote)) {
+        throw new Error('userVote must be 1 or -1');
+      }
+
+      const post = await AppDataSource.getRepository(Post).findOne({
+        where: { id: +req.params.postId },
+        relations: {
+          comments: true,
+          votes: true,
+        },
       });
-      const existingVote = post.votes?.find(
-        (vote) => vote.userId === post.userId,
+
+      const existingVote = post.votes.find(
+        (vote) => +vote.userId === +req.body.userId,
       );
 
       if (existingVote) {
-        return res.json({ data: existingVote });
+        // user may be trying to change vote from negative to positive or vice versa
+        const updatedVote = AppDataSource.getRepository(Vote).merge(
+          existingVote,
+          req.body,
+        );
+        const savedVote = await AppDataSource.getRepository(Vote).save(
+          updatedVote,
+        );
+        return res.json({ data: savedVote });
       }
       const createdVote = AppDataSource.getRepository(Vote).create({
         userVote: +req.body.userVote,
         post,
-        userId: post.userId,
+        userId: +req.body.userId,
       });
       const vote = await AppDataSource.getRepository(Vote).save(createdVote);
-      return res.status(200).json({ data: vote });
+      return res.status(200).json({ message: 'successfully voted' });
     } catch (error) {
       next(error);
     }
