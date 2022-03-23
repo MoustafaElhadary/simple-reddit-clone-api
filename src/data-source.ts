@@ -13,7 +13,7 @@ export const AppDataSource = new DataSource({
   password: process.env.PGPASSWORD,
   database: process.env.PGDATABASE,
   synchronize: true,
-  logging: true,
+  logging: false,
   entities: [Post, Comment, Vote],
   migrations: ['migration/*.ts'],
   subscribers: [],

@@ -1,6 +1,16 @@
 import axios from 'axios';
 import { NextFunction, Request, Response } from 'express';
 
+function appendUserObject(user: any) {
+  return {
+    ...user,
+    imageUrl:
+      user.id % 2
+        ? `https://randomuser.me/api/portraits/men/${user.id}.jpg`
+        : `https://randomuser.me/api/portraits/women/${user.id}.jpg`,
+  };
+}
+
 export const userController = {
   async getAllUsers(req: Request, res: Response, next: NextFunction) {
     try {
@@ -8,16 +18,8 @@ export const userController = {
         'https://jsonplaceholder.typicode.com/users',
       );
       const data = await response.data;
-      const newData = data.map((d) => {
-        return {
-          ...d,
-          imageUrl:
-            d.id % 2
-              ? `https://randomuser.me/api/portraits/men/${d.id}.jpg`
-              : `https://randomuser.me/api/portraits/women/${d.id}.jpg`,
-        };
-      });
-      res.json({ data:newData });
+      const newData = data.map((user) => appendUserObject(user));
+      res.json({ data: newData });
     } catch (error) {
       next(error);
     }
@@ -29,13 +31,9 @@ export const userController = {
       );
       const data = await response.data;
 
-      res.json({ data:{
-          ...data,
-          imageUrl:
-          data.id % 2
-            ? `https://randomuser.me/api/portraits/men/${data.id}.jpg`
-            : `https://randomuser.me/api/portraits/women/${data.id}.jpg`
-      } });
+      res.json({
+        data: appendUserObject(data),
+      });
     } catch (error) {
       next(error);
     }
